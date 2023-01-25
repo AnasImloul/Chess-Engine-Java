@@ -2,7 +2,6 @@ package ChessPiece;
 
 import ChessMove.Step;
 
-import java.awt.*;
 import java.util.Collection;
 import java.util.List;
 
@@ -20,7 +19,7 @@ public class Rook extends Piece {
     static final Collection<Step> captureSteps = normalSteps;
 
 
-    public Rook(Point position, PieceColor color) {
-        super(position, color, PieceType.ROOK);
+    public Rook(PieceColor pieceColor) {
+        super(pieceColor, PieceType.ROOK);
     }
 }

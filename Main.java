@@ -8,19 +8,21 @@ import java.awt.*;
 
 public class Main {
     public static void main(String[] args) {
-
         double start, end;
 
-        ChessPiece piece = new Pawn(new Point(0, 0), PieceColor.WHITE);
+        start = System.nanoTime();
+        for (int i = 0; i < 1_000_000_000; i++) {
+            ChessPiece piece = new Pawn(PieceColor.WHITE);
+        }
+
+        ChessPiece piece = new Pawn(PieceColor.WHITE);
+        end = System.nanoTime();
 
         ChessBoard board = new Board();
 
-        board.addPiece(piece);
-        //board.move(new Point(0, 0), new Point(0, 1));
-
-        System.out.println(board.isLegalMove(new Point(0, 0), new Point(0, 1)));
+        board.addPiece(piece, new Point(0, 0));
 
 
-        // System.out.println("Time taken: " + (end - start) / 1_000_000 + " milliseconds");
+        System.out.println("Time to create a Pawn: " + (end - start) / 1_000_000 + "ms");
     }
 }

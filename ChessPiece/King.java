@@ -4,12 +4,11 @@ import ChessBoard.ChessBoard;
 import ChessBoard.BoardState;
 import ChessMove.Step;
 
-import java.awt.*;
 import java.util.Collection;
 import java.util.List;
 
 
-public class King extends Piece implements Checkable{
+public class King extends Piece implements Checkable {
 
     private static final Step[] steps = new Step[]{
             new Step(0, 1),
@@ -22,13 +21,14 @@ public class King extends Piece implements Checkable{
             new Step(1, 1)
     };
 
+
     static final Collection<Step> normalSteps = List.of(steps);
     static final Collection<Step> captureSteps = normalSteps;
 
-
-    public King(Point position, PieceColor color) {
-        super(position, color, PieceType.KING);
+    public King(PieceColor pieceColor) {
+        super(pieceColor, PieceType.KING);
     }
+
 
     @Override
     public boolean isChecked(ChessBoard board) {

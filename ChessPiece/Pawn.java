@@ -1,16 +1,11 @@
 package ChessPiece;
 
-import ChessMove.Step;
+public class Pawn extends Piece implements Pawnoid, Promotable {
 
 
-import java.awt.*;
-import java.util.Collection;
-import java.util.List;
 
-public class Pawn extends Pawnoid implements Promotable {
-
-    public Pawn(Point position, PieceColor color) {
-        super(position, color, PieceType.PAWN);
+    public Pawn(PieceColor pieceColor) {
+        super(pieceColor, PieceType.PAWN);
     }
 
     @Override

@@ -2,9 +2,9 @@ package ChessPiece;
 
 import ChessMove.Step;
 
-import java.awt.*;
 import java.util.Collection;
 import java.util.List;
+
 
 public class Queen extends Piece {
 
@@ -23,7 +23,7 @@ public class Queen extends Piece {
     static final Collection<Step> captureSteps = normalSteps;
 
 
-    public Queen(Point position, PieceColor color) {
-        super(position, color, PieceType.QUEEN);
+    public Queen(PieceColor pieceColor) {
+        super(pieceColor, PieceType.QUEEN);
     }
 }

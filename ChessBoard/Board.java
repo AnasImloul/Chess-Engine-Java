@@ -1,87 +1,91 @@
 package ChessBoard;
 
-import ChessPiece.ChessPiece;
+import ChessMove.*;
+import ChessPiece.*;
 
 import java.awt.*;
-import java.util.HashMap;
+import java.util.Collection;
 
 public class Board implements ChessBoard {
 
     public static final int BOARD_SIZE = 8;
 
-    private final ChessPiece[][] pieces;
+    private int width;
+    private int height;
 
-    private final HashMap<Point, Boolean> isLegalCache = new HashMap<>();
+    private final PieceContainer pieceContainer;
+
+    private final MoveValidator moveValidator;
+    private final CheckDetector checkDetector;
+    private final MoveTracker moveTracker;
+    private final BoardStateManager boardStateManager;
+
+    public Board(int width, int height) {
+        this.width = width;
+        this.height = height;
+
+        this.pieceContainer = new PieceContainer();
+
+        this.moveTracker = new MoveTracker(this);
+        this.moveValidator = new MoveValidator(this);
+        this.checkDetector = new CheckDetector(this);
+        this.boardStateManager = new BoardStateManager(this);
+    }
 
     public Board(){
-        this.pieces = new ChessPiece[BOARD_SIZE][BOARD_SIZE];
+
+        this.width = BOARD_SIZE;
+        this.height = BOARD_SIZE;
+
+        this.pieceContainer = new PieceContainer();
+
+        this.moveValidator = new MoveValidator(this);
+        this.checkDetector = new CheckDetector(this);
+        this.boardStateManager = new BoardStateManager(this);
+        this.moveTracker = new MoveTracker(this);
     }
 
     @Override
     public int getWidth() {
-        return BOARD_SIZE;
+        return width;
     }
 
     @Override
     public int getHeight() {
-        return BOARD_SIZE;
+        return height;
     }
 
     @Override
-    public void addPiece(ChessPiece piece) {
-        Point position = piece.getPosition();
-        if (isOutOfBounds(position)) {
-            throw new IllegalArgumentException("Position is out of bounds");
-        }
-        if (getTileState(position) != TileState.EMPTY) {
-            throw new IllegalArgumentException("There is already a piece at this position");
-        }
-        setPieceAt(piece, position);
+    public void addPiece(ChessPiece piece, Point position) {
+        pieceContainer.put(piece, position);
     }
 
     @Override
-    public boolean isLegalMove(Point from, Point to) {
-        if (isOutOfBounds(from) || isOutOfBounds(to)) {
-            return false;
+    public boolean isLegalMove(Move move) {
+        return moveValidator.isValidMove(move);
+    }
+
+    @Override
+    public void play(Move move) {
+        if (!isLegalMove(move)) {
+            throw new IllegalArgumentException("Move is not legal");
         }
+        Point from = move.getFrom();
+        Point to = move.getTo();
         ChessPiece piece = getPieceAt(from);
-        if (piece == null) {
-            return false;
-        }
-        return piece.isLegalMove(this, to);
+
+        resetTile(move.getFrom());
+        setPieceAt(piece, to);
+        piece.setMoved();
     }
 
-
-    private void setPieceAt(ChessPiece piece, Point position) {
-        pieces[position.x][position.y] = piece;
-    }
-
-    private ChessPiece getPieceAt(Point from) {
-        return pieces[from.x][from.y];
-    }
-
-    @Override
-    public void move(Point from, Point to) {
-        if (!isLegalMove(from, to)){
-            throw new IllegalArgumentException("Illegal move");
-        }
-
-        ChessPiece piece = pieces[from.x][from.y];
-        pieces[from.x][from.y] = null;
-        pieces[to.x][to.y] = piece;
-        piece.setPosition(to);
+    private void resetTile(Point position) {
+        pieceContainer.remove(position);
     }
 
     @Override
     public BoardState getBoardState() {
-        return null;
-    }
-
-    @Override
-    public boolean isOutOfBounds(Point point) {
-        int x = (int) point.getX();
-        int y = (int) point.getY();
-        return (x < 0 || x >= BOARD_SIZE || y < 0 || y >= BOARD_SIZE);
+        return boardStateManager.getState();
     }
 
     @Override
@@ -89,12 +93,67 @@ public class Board implements ChessBoard {
         if (isOutOfBounds(point)) {
             throw new IllegalArgumentException("Position is out of bounds");
         }
-        if (pieces[point.x][point.y] == null) {
+        if (getPieceAt(point) == null) {
             return TileState.EMPTY;
         }
-        return switch (pieces[point.x][point.y].getColor()) {
+        return switch (getPieceAt(point).getColor()) {
             case WHITE -> TileState.WHITE;
             case BLACK -> TileState.BLACK;
         };
+    }
+
+    @Override
+    public boolean isTileEmpty(Point point) {
+        return getTileState(point).equals(TileState.EMPTY);
+    }
+
+    @Override
+    public Point getPosition(ChessPiece piece) {
+        return pieceContainer.getPosition(piece);
+    }
+
+    @Override
+    public PieceColor getTurn() {
+        return switch (getBoardState()) {
+            case WHITE_TURN -> PieceColor.WHITE;
+            case BLACK_TURN -> PieceColor.BLACK;
+            default -> throw new IllegalStateException("Game is not in progress");
+        };
+    }
+
+    @Override
+    public Collection<Point> getLegalMoves() {
+        return null;
+    }
+
+    @Override
+    public void undoMove() {
+        moveTracker.undoMove();
+    }
+
+    @Override
+    public void redoMove() {
+        moveTracker.redoMove();
+    }
+    @Override
+    public void setTileUnderAttack(Point position, PieceColor color) {
+        checkDetector.incrementDanger(position, color);
+    }
+    @Override
+    public void resetTileUnderAttack(Point position, PieceColor color) {
+        checkDetector.decrementDanger(position, color);
+    }
+    @Override
+    public Point getKingPosition(PieceColor color) {
+        ChessPiece king = pieceContainer.get(color, PieceType.KING);
+        return pieceContainer.getPosition(king);
+    }
+
+    private ChessPiece getPieceAt(Point from) {
+        return pieceContainer.get(from);
+    }
+
+    private void setPieceAt(ChessPiece piece, Point position){
+        pieceContainer.put(piece, position);
     }
 }

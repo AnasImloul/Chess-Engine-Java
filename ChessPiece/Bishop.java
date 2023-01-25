@@ -2,7 +2,6 @@ package ChessPiece;
 
 import ChessMove.Step;
 
-import java.awt.*;
 import java.util.Collection;
 import java.util.List;
 
@@ -19,7 +18,7 @@ public class Bishop extends Piece {
     static final Collection<Step> captureSteps = normalSteps;
 
 
-        public Bishop(Point position, PieceColor color) {
-            super(position, color, PieceType.BISHOP);
-        }
+    public Bishop(PieceColor pieceColor) {
+        super(pieceColor, PieceType.BISHOP);
+    }
 }

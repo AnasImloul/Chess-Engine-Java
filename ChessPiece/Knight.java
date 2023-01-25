@@ -2,7 +2,6 @@ package ChessPiece;
 
 import ChessMove.Step;
 
-import java.awt.*;
 import java.util.Collection;
 import java.util.List;
 
@@ -23,7 +22,7 @@ public class Knight extends Piece {
     static final Collection<Step> captureSteps = normalSteps;
 
 
-    public Knight(Point position, PieceColor color) {
-        super(position, color, PieceType.KNIGHT);
+    public Knight(PieceColor pieceColor) {
+        super(pieceColor, PieceType.KNIGHT);
     }
 }

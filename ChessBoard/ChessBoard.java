@@ -1,23 +1,44 @@
 package ChessBoard;
 
+import ChessMove.Move;
 import ChessPiece.ChessPiece;
+import ChessPiece.PieceColor;
 
 import java.awt.*;
+import java.util.Collection;
 
 public interface ChessBoard {
 
     int getWidth();
     int getHeight();
 
-    void addPiece(ChessPiece piece);
+    default boolean isOutOfBounds(Point point){
+        return point.x < 0 || point.x >= getWidth() || point.y < 0 || point.y >= getHeight();
+    }
 
-    boolean isLegalMove(Point from, Point to);
+    void addPiece(ChessPiece piece, Point position);
 
-    void move(Point from, Point to);
+    boolean isLegalMove(Move move);
+
+    void play(Move move);
 
     BoardState getBoardState();
 
-    boolean isOutOfBounds(Point point);
     TileState getTileState(Point point);
 
+    boolean isTileEmpty(Point point);
+
+    Point getPosition(ChessPiece piece);
+
+    Point getKingPosition(PieceColor color);
+
+    PieceColor getTurn();
+
+    Collection<Point> getLegalMoves();
+
+    void setTileUnderAttack(Point position, PieceColor color);
+    void resetTileUnderAttack(Point position, PieceColor color);
+
+    void undoMove();
+    void redoMove();
 }
